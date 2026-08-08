@@ -1,10 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#REVISION4
+#R4
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 WINHUB_RAW="https://raw.githubusercontent.com/LuKazuu/WinHub/main"
-HANGOVER_TAG="hangover-wine-11.14-r10"
+HANGOVER_TAG="hangover-wine-11.14-r15"
 HANGOVER_BASE="https://github.com/LuKazuu/WinHubWine/releases/download/${HANGOVER_TAG}"
 
 termux-setup-storage
@@ -19,6 +19,11 @@ trap cleanup EXIT
 pkg install -y x11-repo
 pkg update -y && pkg upgrade -y
 pkg install -y termux-x11-nightly xorg-xrandr pulseaudio xfce4 xfce4-terminal zstd tar vulkan-loader-generic mesa mesa-vulkan-icd-freedreno
+
+TURNIP_TERMUX_DEFAULT_DIR="${TERMUX_PREFIX}/var/lib/turnip-termux"
+mkdir -p "${TURNIP_TERMUX_DEFAULT_DIR}"
+apt install --reinstall -y mesa-vulkan-icd-freedreno
+cp -f "${TERMUX_PREFIX}/lib/libvulkan_freedreno.so" "${TURNIP_TERMUX_DEFAULT_DIR}/libvulkan_freedreno.so"
 
 TURNIP_WRAPPER_DEFAULT_DIR="${TERMUX_PREFIX}/var/lib/turnip-wrapper"
 
@@ -109,9 +114,9 @@ HODLL=libwow64fex.dll
 # libwow64fex.dll / wowbox64.dll
 LC_ALL=en_US.UTF-8
 WINEESYNC=1
-WINE_VMR7_GDI_FALLBACK=1
+WINE_DDRAW_GDI_FALLBACK=0
 WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1
-WINEVMEMMAXSIZE=4096
+WINEVMEMMAXSIZE=2048
 PULSE_LATENCY_MSEC=60
 TZ=Asia/Tokyo
 WINESERVICES=1
@@ -137,7 +142,7 @@ ZINK_DEBUG=compact
 GALLIUM_THREAD=1
 WRAPPER_VK_VERSION=1.4
 WRAPPER_EXTENSION_BLACKLIST=none
-WRAPPER_VMEM_MAX_SIZE=4096
+WRAPPER_VMEM_MAX_SIZE=2048
 WRAPPER_RESOURCE_TYPE=auto
 WRAPPER_USE_BCN_CACHE=0
 
@@ -232,10 +237,6 @@ case "\${GPU_BACKEND}" in
         TURNIP_TERMUX_DEFAULT="\${TERMUX_PREFIX}/var/lib/turnip-termux/libvulkan_freedreno.so"
         TURNIP_SOURCE_TERMUX="\$(ls "\${TURNIP_TERMUX_DIR}/"*.so 2>/dev/null | head -n 1 || true)"
         if [ -n "\${TURNIP_SOURCE_TERMUX}" ]; then
-            if [ ! -f "\${TURNIP_TERMUX_DEFAULT}" ]; then
-                mkdir -p "\$(dirname "\${TURNIP_TERMUX_DEFAULT}")"
-                cp -f "\${TERMUX_PREFIX}/lib/libvulkan_freedreno.so" "\${TURNIP_TERMUX_DEFAULT}"
-            fi
             cp -f "\${TURNIP_SOURCE_TERMUX}" "\${TERMUX_PREFIX}/lib/libvulkan_freedreno.so"
         elif [ -f "\${TURNIP_TERMUX_DEFAULT}" ]; then
             cp -f "\${TURNIP_TERMUX_DEFAULT}" "\${TERMUX_PREFIX}/lib/libvulkan_freedreno.so"
