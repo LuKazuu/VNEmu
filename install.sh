@@ -440,6 +440,16 @@ Categories=System;
 EOF
 chmod +x ~/Desktop/winetaskmgr.desktop
 
+cat > ~/Desktop/winecontrol.desktop << EOF
+[Desktop Entry]
+Type=Application
+Name=Wine Control
+Exec=wine control
+Icon=xfwm4-default
+Categories=System;
+EOF
+chmod +x ~/Desktop/winecontrol.desktop
+
 clear
 echo "Type This Command to Start Desktop and Wine:"
 echo "startx11"
