@@ -1,4 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
+#WinHubRevision5
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
@@ -115,7 +116,7 @@ LC_ALL=en_US.UTF-8
 WINEESYNC=1
 WINE_DDRAW_GDI_FALLBACK=1
 WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1
-WINEVMEMMAXSIZE=2048
+WINEVMEMMAXSIZE=4096
 PULSE_LATENCY_MSEC=60
 TZ=Asia/Tokyo
 WINESERVICES=1
@@ -147,7 +148,7 @@ ZINK_DEBUG=compact
 GALLIUM_THREAD=1
 WRAPPER_VK_VERSION=1.4
 WRAPPER_EXTENSION_BLACKLIST=none
-WRAPPER_VMEM_MAX_SIZE=2048
+WRAPPER_VMEM_MAX_SIZE=4096
 WRAPPER_RESOURCE_TYPE=auto
 
 # HUD
@@ -204,6 +205,7 @@ fi
 if [ ! -f "\${SHARED_DIR}/override_dll.txt" ]; then
     cat > "\${SHARED_DIR}/override_dll.txt" << 'INNER_EOF'
 version=n,b
+nsisvclstyles=d
 INNER_EOF
 fi
 
