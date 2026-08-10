@@ -1,5 +1,4 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#R4
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
@@ -114,7 +113,7 @@ HODLL=libwow64fex.dll
 # libwow64fex.dll / wowbox64.dll
 LC_ALL=en_US.UTF-8
 WINEESYNC=1
-WINE_DDRAW_GDI_FALLBACK=0
+WINE_DDRAW_GDI_FALLBACK=1
 WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1
 WINEVMEMMAXSIZE=2048
 PULSE_LATENCY_MSEC=60
@@ -133,6 +132,12 @@ OPENGL_DRIVER=llvmpipe
 # zink / llvmpipe
 WRAPPER_BCN=0
 # 0 / 1 / 2
+WRAPPER_USE_BCN_CACHE=0
+# 0 / 1
+WRAPPER_SURFACE_FORMAT=rgba8
+# rgba8 / bgra8
+TU_DEBUG=noconform
+# noconform / sysmem / gmem / etc.
 MESA_NO_ERROR=1
 MESA_GL_VERSION_OVERRIDE=4.6
 MESA_GLES_VERSION_OVERRIDE=3.2
@@ -144,7 +149,6 @@ WRAPPER_VK_VERSION=1.4
 WRAPPER_EXTENSION_BLACKLIST=none
 WRAPPER_VMEM_MAX_SIZE=2048
 WRAPPER_RESOURCE_TYPE=auto
-WRAPPER_USE_BCN_CACHE=0
 
 # HUD
 GALLIUM_HUD=simple,fps
@@ -232,7 +236,7 @@ esac
 case "\${GPU_BACKEND}" in
     termux)
         export VK_ICD_FILENAMES="\${TERMUX_PREFIX}/share/vulkan/icd.d/freedreno_icd.aarch64.json"
-        unset VK_LAYER_PATH WRAPPER_LAYER_PATH WRAPPER_CACHE_PATH WRAPPER_EMULATE_BCN ENABLE_BCN_COMPUTE BCN_COMPUTE_AUTO USE_CPU_BCN
+        unset VK_LAYER_PATH WRAPPER_LAYER_PATH WRAPPER_CACHE_PATH WRAPPER_EMULATE_BCN ENABLE_BCN_COMPUTE BCN_COMPUTE_AUTO
         unset ADRENOTOOLS_DRIVER_PATH ADRENOTOOLS_DRIVER_NAME ADRENOTOOLS_HOOKS_PATH ADRENOTOOLS_REDIRECT_DIR
         TURNIP_TERMUX_DEFAULT="\${TERMUX_PREFIX}/var/lib/turnip-termux/libvulkan_freedreno.so"
         TURNIP_SOURCE_TERMUX="\$(ls "\${TURNIP_TERMUX_DIR}/"*.so 2>/dev/null | head -n 1 || true)"
@@ -249,18 +253,16 @@ case "\${GPU_BACKEND}" in
         export WRAPPER_CACHE_PATH="\${WRAPPER_CACHE_DIR}"
         case "\${WRAPPER_BCN}" in
             0)
-                unset WRAPPER_EMULATE_BCN ENABLE_BCN_COMPUTE BCN_COMPUTE_AUTO USE_CPU_BCN
+                unset WRAPPER_EMULATE_BCN ENABLE_BCN_COMPUTE BCN_COMPUTE_AUTO
                 ;;
             1)
                 export WRAPPER_EMULATE_BCN=3
-                export ENABLE_BCN_COMPUTE=1
-                export BCN_COMPUTE_AUTO=1
-                unset USE_CPU_BCN
+                unset ENABLE_BCN_COMPUTE BCN_COMPUTE_AUTO
                 ;;
             2)
-                export WRAPPER_EMULATE_BCN=3
-                unset ENABLE_BCN_COMPUTE BCN_COMPUTE_AUTO
-                export USE_CPU_BCN=all
+                export WRAPPER_EMULATE_BCN=2
+                export ENABLE_BCN_COMPUTE=1
+                export BCN_COMPUTE_AUTO=0
                 ;;
         esac
         case "\${WRAPPER_DRIVER}" in
