@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#WinHubRevision5
+#R5
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
@@ -129,6 +129,8 @@ GPU_BACKEND=wrapper
 # wrapper / termux
 WRAPPER_DRIVER=system
 # system / turnip
+TU_DEBUG=noconform
+# noconform / sysmem / gmem / etc.
 OPENGL_DRIVER=llvmpipe
 # zink / llvmpipe
 WRAPPER_BCN=0
@@ -137,8 +139,12 @@ WRAPPER_USE_BCN_CACHE=0
 # 0 / 1
 WRAPPER_SURFACE_FORMAT=rgba8
 # rgba8 / bgra8
-TU_DEBUG=noconform
-# noconform / sysmem / gmem / etc.
+WRAPPER_DISABLE_PRESENT_WAIT=1
+# 0 / 1
+WRAPPER_VK_VERSION=1.4
+WRAPPER_EXTENSION_BLACKLIST=none
+WRAPPER_VMEM_MAX_SIZE=4096
+WRAPPER_RESOURCE_TYPE=auto
 MESA_NO_ERROR=1
 MESA_GL_VERSION_OVERRIDE=4.6
 MESA_GLES_VERSION_OVERRIDE=3.2
@@ -146,10 +152,6 @@ MESA_VK_WSI_PRESENT_MODE=mailbox
 ZINK_DESCRIPTORS=lazy
 ZINK_DEBUG=compact
 GALLIUM_THREAD=1
-WRAPPER_VK_VERSION=1.4
-WRAPPER_EXTENSION_BLACKLIST=none
-WRAPPER_VMEM_MAX_SIZE=4096
-WRAPPER_RESOURCE_TYPE=auto
 
 # HUD
 GALLIUM_HUD=simple,fps
@@ -217,10 +219,6 @@ set +a
 
 export XDG_DATA_DIRS="\${TERMUX_PREFIX}/share:\${XDG_DATA_DIRS:-}"
 export XDG_CONFIG_DIRS="\${TERMUX_PREFIX}/etc/xdg:\${XDG_CONFIG_DIRS:-}"
-
-for var in WRAPPER_VK_VERSION WRAPPER_EXTENSION_BLACKLIST WRAPPER_VMEM_MAX_SIZE WRAPPER_RESOURCE_TYPE; do
-    [ -n "\${!var}" ] || unset "\$var"
-done
 
 case "\${OPENGL_DRIVER}" in
     zink)
