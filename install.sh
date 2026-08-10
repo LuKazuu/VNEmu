@@ -129,10 +129,10 @@ GPU_BACKEND=wrapper
 # wrapper / termux
 WRAPPER_DRIVER=system
 # system / turnip
-TU_DEBUG=noconform
-# noconform / sysmem / gmem / etc.
 OPENGL_DRIVER=llvmpipe
 # zink / llvmpipe
+TU_DEBUG=noconform
+# noconform / sysmem / gmem / etc.
 WRAPPER_BCN=0
 # 0 / 1 / 2
 WRAPPER_USE_BCN_CACHE=0
@@ -443,7 +443,7 @@ chmod +x ~/Desktop/winetaskmgr.desktop
 cat > ~/Desktop/winecontrol.desktop << EOF
 [Desktop Entry]
 Type=Application
-Name=Wine Control
+Name=Wine Control Panel
 Exec=wine control
 Icon=xfwm4-default
 Categories=System;
