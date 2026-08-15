@@ -1,10 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#R5
+#WINHUBREVISION5
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 WINHUB_RAW="https://raw.githubusercontent.com/LuKazuu/WinHub/main"
-HANGOVER_TAG="hangover-wine-11.14-r16"
+HANGOVER_TAG="hangover-wine-11.14-r27"
 HANGOVER_BASE="https://github.com/LuKazuu/WinHubWine/releases/download/${HANGOVER_TAG}"
 
 termux-setup-storage
@@ -54,7 +54,7 @@ HANGOVER_DEBS=(
 for deb in "${HANGOVER_DEBS[@]}"; do
     curl -fL --retry 3 --retry-all-errors -o "${WORKDIR}/${deb}" "${HANGOVER_BASE}/${deb}"
 done
-apt install -y --allow-downgrades "${HANGOVER_DEBS[@]/#/${WORKDIR}/}"
+apt install -y --reinstall --allow-downgrades "${HANGOVER_DEBS[@]/#/${WORKDIR}/}"
 
 LAYERS_DEFAULT_DIR="${TERMUX_PREFIX}/var/lib/layers-default"
 WINE_DIR="${TERMUX_PREFIX}/opt/hangover-wine/lib/wine/aarch64-windows"
