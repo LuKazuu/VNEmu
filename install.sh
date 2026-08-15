@@ -4,7 +4,7 @@ set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 WINHUB_RAW="https://raw.githubusercontent.com/LuKazuu/WinHub/main"
-HANGOVER_TAG="hangover-wine-11.14-r27"
+HANGOVER_TAG="hangover-wine-11.15-r28"
 HANGOVER_BASE="https://github.com/LuKazuu/WinHubWine/releases/download/${HANGOVER_TAG}"
 
 termux-setup-storage
@@ -46,10 +46,10 @@ cp -f "${EXTRA_LIBS_TMPDIR}/usr/share/vulkan/implicit_layer.d/libbcn_layer.json"
 ln -sfn "libandroid-shmem.so" "${TERMUX_PREFIX}/lib/libandroid-sysvshm.so"
 
 HANGOVER_DEBS=(
-    "hangover-wine_11.14_aarch64.deb"
-    "hangover-libarm64ecfex_11.14_aarch64.deb"
-    "hangover-wowbox64_11.14_aarch64.deb"
-    "hangover-libwow64fex_11.14_aarch64.deb"
+    "hangover-wine_11.15_aarch64.deb"
+    "hangover-libarm64ecfex_11.15_aarch64.deb"
+    "hangover-wowbox64_11.15_aarch64.deb"
+    "hangover-libwow64fex_11.15_aarch64.deb"
 )
 for deb in "${HANGOVER_DEBS[@]}"; do
     curl -fL --retry 3 --retry-all-errors -o "${WORKDIR}/${deb}" "${HANGOVER_BASE}/${deb}"
