@@ -1,11 +1,11 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#WINHUBREVISION5
+#VNEMUREVISION5
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
-WINHUB_RAW="https://raw.githubusercontent.com/LuKazuu/WinHub/main"
+VNEMU_RAW="https://raw.githubusercontent.com/LuKazuu/VNEmu/main"
 HANGOVER_TAG="hangover-wine-11.15-r28"
-HANGOVER_BASE="https://github.com/LuKazuu/WinHubWine/releases/download/${HANGOVER_TAG}"
+HANGOVER_BASE="https://github.com/LuKazuu/VNEmuWine/releases/download/${HANGOVER_TAG}"
 
 termux-setup-storage
 
@@ -28,13 +28,13 @@ cp -f "${TERMUX_PREFIX}/lib/libvulkan_freedreno.so" "${TURNIP_TERMUX_DEFAULT_DIR
 TURNIP_WRAPPER_DEFAULT_DIR="${TERMUX_PREFIX}/var/lib/turnip-wrapper"
 
 WRAPPER_ARCHIVE="${WORKDIR}/wrapper.tzst"
-curl -fL --retry 3 --retry-all-errors -o "${WRAPPER_ARCHIVE}" "${WINHUB_RAW}/wrapper/pipetto/wrapper.tzst"
+curl -fL --retry 3 --retry-all-errors -o "${WRAPPER_ARCHIVE}" "${VNEMU_RAW}/wrapper/pipetto/wrapper.tzst"
 zstd -dc "${WRAPPER_ARCHIVE}" | tar -x -C "${TERMUX_PREFIX}" --strip-components=1
 
 EXTRA_LIBS_ARCHIVE="${WORKDIR}/extra_libs.tzst"
 EXTRA_LIBS_TMPDIR="${WORKDIR}/extra_libs"
 mkdir -p "${EXTRA_LIBS_TMPDIR}" "${TURNIP_WRAPPER_DEFAULT_DIR}" "${TERMUX_PREFIX}/share/vulkan/implicit_layer.d"
-curl -fL --retry 3 --retry-all-errors -o "${EXTRA_LIBS_ARCHIVE}" "${WINHUB_RAW}/wrapper/extra_libs.tzst"
+curl -fL --retry 3 --retry-all-errors -o "${EXTRA_LIBS_ARCHIVE}" "${VNEMU_RAW}/wrapper/extra_libs.tzst"
 zstd -dc "${EXTRA_LIBS_ARCHIVE}" | tar -x -C "${EXTRA_LIBS_TMPDIR}" \
     usr/lib/libbcn_layer.so \
     usr/lib/libvulkan_freedreno.so \
