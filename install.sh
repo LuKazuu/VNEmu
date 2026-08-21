@@ -1,10 +1,10 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#VNEMUREVISION5
+#VNEMUREV5
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 VNEMU_RAW="https://raw.githubusercontent.com/LuKazuu/VNEmu/main"
-HANGOVER_TAG="hangover-wine-11.15-r28"
+HANGOVER_TAG="hangover-wine-11.15-r29"
 HANGOVER_BASE="https://github.com/LuKazuu/VNEmuWine/releases/download/${HANGOVER_TAG}"
 
 termux-setup-storage
@@ -18,7 +18,21 @@ trap cleanup EXIT
 
 pkg install -y x11-repo
 pkg update -y && pkg upgrade -y
-pkg install -y termux-x11-nightly xorg-xrandr pulseaudio xfce4 xfce4-terminal zstd tar vulkan-loader-generic mesa mesa-vulkan-icd-freedreno
+pkg install -y termux-x11-nightly xorg-xrandr pulseaudio alsa-lib alsa-plugins xfce4 xfce4-terminal zstd tar vulkan-loader-generic mesa mesa-vulkan-icd-freedreno
+
+if [ ! -f "${HOME}/.asoundrc" ]; then
+    cat > "${HOME}/.asoundrc" << 'ASOUNDEOF'
+pcm.!default {
+    type pulse
+    server "127.0.0.1"
+}
+
+ctl.!default {
+    type pulse
+    server "127.0.0.1"
+}
+ASOUNDEOF
+fi
 
 TURNIP_TERMUX_DEFAULT_DIR="${TERMUX_PREFIX}/var/lib/turnip-termux"
 mkdir -p "${TURNIP_TERMUX_DEFAULT_DIR}"
@@ -117,8 +131,10 @@ WINEESYNC=1
 WINE_DDRAW_GDI_FALLBACK=1
 WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1
 WINEVMEMMAXSIZE=4096
-PULSE_LATENCY_MSEC=60
 TZ=Asia/Tokyo
+AUDIO_BACKEND=pulse
+# pulse / alsa
+PULSE_LATENCY_MSEC=60
 WINESERVICES=1
 # 0 / 1
 CPU_TASKSET=all
@@ -319,6 +335,8 @@ if [ ! -d "\${WINEPREFIX}/drive_c/windows/system32" ]; then
     wine wineboot -u
     wineserver -w
 fi
+
+wine reg add "HKCU\Software\Wine\Drivers" /v Audio /d "\${AUDIO_BACKEND}" /f > /dev/null 2>&1
 
 declare -A DLL_OVERRIDES_MAP
 declare -A DLL_USER_NAMES
