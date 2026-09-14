@@ -1,5 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#VNEmuAerA
+#VNEmuREV6
+#AerA
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
@@ -53,7 +54,7 @@ WRAPPER_USE_BCN_CACHE=0
 WRAPPER_SURFACE_FORMAT=bgra8
 # bgra8 / rgba8
 WRAPPER_DISABLE_PRESENT_WAIT=1
-# 1 / 0
+# 0 / 1
 WRAPPER_VK_VERSION=1.4
 WRAPPER_EXTENSION_BLACKLIST=none
 WRAPPER_VMEM_MAX_SIZE=4096
@@ -65,6 +66,7 @@ MESA_VK_WSI_PRESENT_MODE=mailbox
 ZINK_DESCRIPTORS=lazy
 ZINK_DEBUG=compact
 GALLIUM_THREAD=1
+# 0 / 1
 
 # HUD
 GALLIUM_HUD=simple,fps
