@@ -1,13 +1,198 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#VNEMUREV5
+#VNEmu
+#AerA
+#V6
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 VNEMU_RAW="https://raw.githubusercontent.com/LuKazuu/VNEmu/main"
-HANGOVER_TAG="hangover-wine-11.16-r31"
+HANGOVER_TAG="hangover-wine-11.17-r42"
 HANGOVER_BASE="https://github.com/LuKazuu/VNEmuWine/releases/download/${HANGOVER_TAG}"
 
 termux-setup-storage
+sleep 1
+
+SHARED_DIR=~/storage/shared/Termux
+mkdir -p "${SHARED_DIR}/layers" "${SHARED_DIR}/logs" "${SHARED_DIR}/turnip/wrapper" "${SHARED_DIR}/turnip/termux" "${SHARED_DIR}/dlls/system32" "${SHARED_DIR}/dlls/syswow64"
+
+TEMPLATE_DIR="${TERMUX_PREFIX}/var/lib/vnemu-defaults"
+mkdir -p "${TEMPLATE_DIR}"
+
+cat > "${TEMPLATE_DIR}/desktop.txt" << 'INNER_EOF'
+# BASIC
+WINEDEBUG=-all
+HODLL=libwow64fex.dll
+# libwow64fex.dll / wowbox64.dll
+LC_ALL=en_US.UTF-8
+WINE_DDRAW_GDI_FALLBACK=1
+# 0 / 1
+WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1
+# 0 / 1
+WINEVMEMMAXSIZE=4096
+TZ=Asia/Tokyo
+AUDIO_BACKEND=pulse
+# pulse / alsa
+PULSE_LATENCY_MSEC=45
+# 30 / 45 / 60
+WINESERVICES=1
+# 0 / 1
+CPU_TASKSET=all
+# all / 0,1,2,3 / 4,5,6,7
+
+# GPU
+GPU_BACKEND=wrapper
+# wrapper / termux
+WRAPPER_DRIVER=system
+# system / turnip
+OPENGL_DRIVER=llvmpipe
+# llvmpipe / zink
+TU_DEBUG=noconform
+# noconform / sysmem / gmem / etc.
+WRAPPER_BCN=0
+# 0 / 1 / 2
+WRAPPER_USE_BCN_CACHE=0
+# 0 / 1
+WRAPPER_SURFACE_FORMAT=bgra8
+# bgra8 / rgba8
+WRAPPER_DISABLE_PRESENT_WAIT=1
+# 1 / 0
+WRAPPER_VK_VERSION=1.4
+WRAPPER_EXTENSION_BLACKLIST=none
+WRAPPER_VMEM_MAX_SIZE=4096
+WRAPPER_RESOURCE_TYPE=auto
+MESA_NO_ERROR=1
+MESA_GL_VERSION_OVERRIDE=4.6
+MESA_GLES_VERSION_OVERRIDE=3.2
+MESA_VK_WSI_PRESENT_MODE=mailbox
+ZINK_DESCRIPTORS=lazy
+ZINK_DEBUG=compact
+GALLIUM_THREAD=1
+
+# HUD
+GALLIUM_HUD=simple,fps
+DXVK_HUD=fps
+INNER_EOF
+
+cat > "${TEMPLATE_DIR}/box64.txt" << 'INNER_EOF'
+BOX64_DYNAREC_SAFEFLAGS=0
+# 0: no flags on CALL/RET / 1: most RETs need flags [Default] / 2: all CALL/RET need flags
+
+BOX64_DYNAREC_STRONGMEM=0
+# 0: none [Default] / 1: basic barriers / 2: +SIMD barriers / 3: +more barriers / 4: mimic x86 TSO (QEMU-like)
+
+BOX64_DYNAREC_FASTNAN=1
+# 0: precise -NaN emulation / 1: fast, no special handling [Default]
+
+BOX64_DYNAREC_FASTROUND=1
+# 0: precise x86-like rounding / 1: fast, no special handling [Default] / 2: precise rounding + fast int↔float conversion
+
+BOX64_DYNAREC_X87DOUBLE=0
+# 0: use float when possible [Default] / 1: always use double / 2: check Precision Control
+
+BOX64_DYNAREC=1
+# 0: disable DynaRec / 1: enable DynaRec
+
+BOX64_DYNAREC_WAIT=1
+# 0: don't wait, use interpreter / 1: wait for block ready [Default]
+
+BOX64_DYNAREC_ALIGNED_ATOMICS=0
+# 0: unaligned atomics handling [Default] / 1: aligned atomics only (faster, may SIGBUS)
+
+BOX64_DYNAREC_BIGBLOCK=2
+# 0: small blocks (multithread/JIT-friendly) / 1: as big as possible / 2: bigger, elf memory only [Default] / 3: bigger, all memory types (Wine)
+
+BOX64_DYNAREC_CALLRET=1
+# 0: no optimize, use jump table / 1: optimize, skip jump table / 2: optimize + handle dirty/modified block return [Default]
+
+BOX64_DYNAREC_WEAKBARRIER=0
+# 0: regular safe barrier / 1: weak barriers, more performance [Default] / 2: weak barriers + disable last write barriers
+
+BOX64_DYNAREC_PAUSE=0
+# 0: ignore PAUSE [Default] / 1: use YIELD / 2: use WFI / 3: use SEVL+WFE
+
+BOX64_DYNAREC_DF=1
+# 0: disable deferred flags / 1: enable deferred flags [Default]
+
+BOX64_DYNAREC_DIRTY=0
+# 0: don't run unprotected/dirty block [Default] / 1: allow continue running (faster, riskier) / 2: also flag hot page as NEVERCLEAN
+
+BOX64_DYNAREC_NATIVEFLAGS=1
+# 0: don't use native flags / 1: use native flags when possible [Default]
+
+BOX64_DYNAREC_VOLATILE_METADATA=1
+# 0: don't use volatile metadata / 1: use volatile metadata from PE files [Default]
+
+BOX64_DYNAREC_DIV0=0
+# 0: don't generate divide-by-zero exception [Default] / 1: generate divide-by-zero exception
+
+BOX64_RDTSC_1GHZ=0
+# 0: use hardware counter if available [Default] / 1: use hardware counter only if precision ≥1GHz
+
+BOX64_CPUTYPE=0
+# 0: emulate Intel CPU [Default] / 1: emulate AMD CPU
+
+BOX64_AVX=0
+# 0: disable AVX / 1: expose AVX, BMI1, F16C, VAES / 2: + AVX2, BMI2, FMA, ADX, VPCLMULQDQ, RDRAND
+
+BOX64_IGNOREINT3=0
+# 0: trigger TRAP signal if handler present [Default] / 1: skip INT3 opcode silently
+INNER_EOF
+
+cat > "${TEMPLATE_DIR}/fexcore.txt" << 'INNER_EOF'
+FEX_TSOENABLED=0
+# 0: TSO memory ordering disabled (may break multithreaded apps, faster) / 1: TSO enabled [Default]
+
+FEX_X87REDUCEDPRECISION=1
+# 0: full x87 precision emulation [Default] / 1: reduced (64-bit) x87 precision, faster but less accurate
+
+FEX_MULTIBLOCK=1
+# 0: disable multiblock compilation / 1: enable multiblock compilation (faster JIT'd code, can cause longer compile stutter) [Default]
+
+FEX_MAXINST=5000
+# 0: unlimited instructions per block / XXXX: max instructions per block [Default: 5000]
+
+FEX_SMALLTSCSCALE=1
+# 0: no TSC scaling / 1: scale cycle counter on low-frequency systems [Default]
+
+FEX_VECTORTSOENABLED=0
+# 0: vector loadstores not forced atomic [Default] / 1: vector loadstores also atomic under TSO
+
+FEX_MEMCPYSETTSOENABLED=0
+# 0: REP MOVS/STOS not forced atomic [Default] / 1: REP MOVS/STOS also atomic under TSO
+
+FEX_HALFBARRIERTSOENABLED=0
+# 0: unaligned loadstores not backpatched to half-barrier atomics / 1: backpatch unaligned loadstores to half-barrier atomics [Default]
+
+FEX_VOLATILEMETADATA=1
+# 0: don't use PE volatile metadata / 1: use PE volatile metadata to guide TSO handling [Default]
+
+FEX_HIDEHYPERVISORBIT=0
+# 0: expose hypervisor CPUID bit [Default] / 1: hide hypervisor CPUID bit
+
+FEX_MONOHACKS=1
+# 0: don't apply Mono-specific SMC hooks / 1: enable SMC hooks + smaller JIT blocks when Mono detected [Default]
+
+FEX_SMCCHECKS=1
+# 0 (none): no code-modification checks / 1 (mtrack): page-tracking based invalidation [Default] / 2 (full): validate code before every run (slow)
+
+FEX_HOSTFEATURES=off
+# off: use default CPU features from host [Default] / comma-separated combination of: {enable,disable}sve, {enable,disable}avx, {enable,disable}afp, {enable,disable}lrcpc, {enable,disable}lrcpc2, {enable,disable}cssc, {enable,disable}pmull128, {enable,disable}rng, {enable,disable}clzero, {enable,disable}atomics, {enable,disable}fcma, {enable,disable}flagm, {enable,disable}flagm2, {enable,disable}frintts, {enable,disable}crypto, {enable,disable}rpres, {enable,disable}svebitperm, {enable,disable}preserveallabi, {enable,disable}wfxt, {enable,disable}3dnow, {enable,disable}sse4a, {enable,disable}mops — force-enable/disable specific JIT CPU features even if the host doesn't support them
+
+FEX_DISABLEL2CACHE=1
+# 0: keep JIT L2 cache lookup active (fewer stutters, more memory use) / 1: disable L2 cache lookup (less memory, may stutter more) [Default]
+
+FEX_DYNAMICL1CACHE=1
+# 0: static JIT L1 cache size / 1: dynamic JIT L1 cache size (less memory, may stutter) [Default]
+INNER_EOF
+
+cat > "${TEMPLATE_DIR}/override_dll.txt" << 'INNER_EOF'
+version=n,b
+nsisvclstyles=d
+INNER_EOF
+
+for cfg in desktop.txt box64.txt fexcore.txt override_dll.txt; do
+    [ -f "${SHARED_DIR}/${cfg}" ] || cp -f "${TEMPLATE_DIR}/${cfg}" "${SHARED_DIR}/${cfg}"
+done
 
 WORKDIR="$(mktemp -d)"
 cleanup() {
@@ -15,6 +200,8 @@ cleanup() {
     pkg clean 2>/dev/null || true
 }
 trap cleanup EXIT
+
+dl() { curl -fL --retry 3 --retry-all-errors -o "$1" "$2"; }
 
 pkg install -y x11-repo
 pkg update -y && pkg upgrade -y
@@ -42,13 +229,32 @@ cp -f "${TERMUX_PREFIX}/lib/libvulkan_freedreno.so" "${TURNIP_TERMUX_DEFAULT_DIR
 TURNIP_WRAPPER_DEFAULT_DIR="${TERMUX_PREFIX}/var/lib/turnip-wrapper"
 
 WRAPPER_ARCHIVE="${WORKDIR}/wrapper.tzst"
-curl -fL --retry 3 --retry-all-errors -o "${WRAPPER_ARCHIVE}" "${VNEMU_RAW}/wrapper/pipetto/wrapper.tzst"
-zstd -dc "${WRAPPER_ARCHIVE}" | tar -x -C "${TERMUX_PREFIX}" --strip-components=1
-
 EXTRA_LIBS_ARCHIVE="${WORKDIR}/extra_libs.tzst"
 EXTRA_LIBS_TMPDIR="${WORKDIR}/extra_libs"
 mkdir -p "${EXTRA_LIBS_TMPDIR}" "${TURNIP_WRAPPER_DEFAULT_DIR}" "${TERMUX_PREFIX}/share/vulkan/implicit_layer.d"
-curl -fL --retry 3 --retry-all-errors -o "${EXTRA_LIBS_ARCHIVE}" "${VNEMU_RAW}/wrapper/extra_libs.tzst"
+
+dl "${WRAPPER_ARCHIVE}" "${VNEMU_RAW}/wrapper/pipetto/wrapper.tzst" &
+DL_PIDS=("$!")
+dl "${EXTRA_LIBS_ARCHIVE}" "${VNEMU_RAW}/wrapper/extra_libs.tzst" &
+DL_PIDS+=("$!")
+
+HANGOVER_DEBS=(
+    "hangover-wine_11.17_aarch64.deb"
+    "hangover-libarm64ecfex_11.17_aarch64.deb"
+    "hangover-wowbox64_11.17_aarch64.deb"
+    "hangover-libwow64fex_11.17_aarch64.deb"
+)
+for deb in "${HANGOVER_DEBS[@]}"; do
+    dl "${WORKDIR}/${deb}" "${HANGOVER_BASE}/${deb}" &
+    DL_PIDS+=("$!")
+done
+
+for pid in "${DL_PIDS[@]}"; do
+    wait "$pid"
+done
+
+zstd -dc "${WRAPPER_ARCHIVE}" | tar -x -C "${TERMUX_PREFIX}" --strip-components=1
+
 zstd -dc "${EXTRA_LIBS_ARCHIVE}" | tar -x -C "${EXTRA_LIBS_TMPDIR}" \
     usr/lib/libbcn_layer.so \
     usr/lib/libvulkan_freedreno.so \
@@ -59,16 +265,15 @@ cp -f "${EXTRA_LIBS_TMPDIR}/usr/share/vulkan/implicit_layer.d/libbcn_layer.json"
 
 ln -sfn "libandroid-shmem.so" "${TERMUX_PREFIX}/lib/libandroid-sysvshm.so"
 
-HANGOVER_DEBS=(
-    "hangover-wine_11.16_aarch64.deb"
-    "hangover-libarm64ecfex_11.16_aarch64.deb"
-    "hangover-wowbox64_11.16_aarch64.deb"
-    "hangover-libwow64fex_11.16_aarch64.deb"
+apt install -y --reinstall --allow-downgrades --allow-change-held-packages "${HANGOVER_DEBS[@]/#/${WORKDIR}/}"
+
+HANGOVER_PKG_NAMES=(
+    "hangover-wine"
+    "hangover-libarm64ecfex"
+    "hangover-wowbox64"
+    "hangover-libwow64fex"
 )
-for deb in "${HANGOVER_DEBS[@]}"; do
-    curl -fL --retry 3 --retry-all-errors -o "${WORKDIR}/${deb}" "${HANGOVER_BASE}/${deb}"
-done
-apt install -y --reinstall --allow-downgrades "${HANGOVER_DEBS[@]/#/${WORKDIR}/}"
+apt-mark hold "${HANGOVER_PKG_NAMES[@]}" 2>/dev/null || true
 
 LAYERS_DEFAULT_DIR="${TERMUX_PREFIX}/var/lib/layers-default"
 WINE_DIR="${TERMUX_PREFIX}/opt/hangover-wine/lib/wine/aarch64-windows"
@@ -92,6 +297,39 @@ exec wine.real "$@"
 WEOF
 chmod +x "${TERMUX_PREFIX}/bin/wine"
 
+echo "Preparing Wine prefix..."
+
+pkill -9 -f "termux.x11" > /dev/null 2>&1 || true
+sleep 0.5
+
+unset PULSE_SERVER
+pulseaudio --kill > /dev/null 2>&1 || true
+pulseaudio --start --exit-idle-time=-1 --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" > /dev/null 2>&1 || true
+sleep 1
+export PULSE_SERVER=127.0.0.1
+
+termux-x11 :0 -ac > /dev/null 2>&1 &
+sleep 2
+
+export DISPLAY=:0
+export WINEPREFIX=~/.wine
+export WINEDEBUG=-all
+export WINEDLLOVERRIDES="mscoree=d;mshtml=d"
+
+export XDG_RUNTIME_DIR="${TERMUX_PREFIX}/tmp/xdg-runtime-$(id -u)"
+mkdir -p "${XDG_RUNTIME_DIR}"
+chmod 700 "${XDG_RUNTIME_DIR}"
+
+wine wineboot -u > /dev/null 2>&1 || true
+wineserver -w
+
+unset WINEDLLOVERRIDES WINEDEBUG WINEPREFIX
+
+pkill -9 -f "termux.x11" > /dev/null 2>&1 || true
+pulseaudio --kill > /dev/null 2>&1 || true
+unset PULSE_SERVER DISPLAY XDG_RUNTIME_DIR
+sleep 0.5
+
 cat > "${TERMUX_PREFIX}/bin/startx11" << EOF
 #!${TERMUX_PREFIX}/bin/bash
 
@@ -99,6 +337,7 @@ TERMUX_PREFIX="${TERMUX_PREFIX}"
 WINE_DIR="\${TERMUX_PREFIX}/opt/hangover-wine/lib/wine/aarch64-windows"
 WINE_DIR_32="\${TERMUX_PREFIX}/opt/hangover-wine/lib/wine/i386-windows"
 SHARED_DIR=~/storage/shared/Termux
+TEMPLATE_DIR="\${TERMUX_PREFIX}/var/lib/vnemu-defaults"
 LAYERS_DIR="\${SHARED_DIR}/layers"
 WINEPREFIX=~/.wine
 LOG_DIR="\${SHARED_DIR}/logs"
@@ -120,112 +359,9 @@ mkdir -p "\${LAYERS_DIR}" "\${WRAPPER_CACHE_DIR}" "\${TURNIP_WRAPPER_DIR}" "\${T
 mkdir -p "\${DLLS_DIR}/system32" "\${DLLS_DIR}/syswow64"
 mkdir -p "\${MANIFEST_DIR}"
 
-if [ ! -f "\${SHARED_DIR}/desktop.txt" ]; then
-    cat > "\${SHARED_DIR}/desktop.txt" << 'INNER_EOF'
-# BASIC
-WINEDEBUG=-all
-HODLL=libwow64fex.dll
-# libwow64fex.dll / wowbox64.dll
-LC_ALL=en_US.UTF-8
-WINEESYNC=1
-WINE_DDRAW_GDI_FALLBACK=1
-WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1
-WINEVMEMMAXSIZE=4096
-TZ=Asia/Tokyo
-AUDIO_BACKEND=pulse
-# pulse / alsa
-PULSE_LATENCY_MSEC=60
-WINESERVICES=1
-# 0 / 1
-CPU_TASKSET=all
-# all / 0-3 / 4-7
-
-# GPU
-GPU_BACKEND=wrapper
-# wrapper / termux
-WRAPPER_DRIVER=system
-# system / turnip
-OPENGL_DRIVER=llvmpipe
-# zink / llvmpipe
-TU_DEBUG=noconform
-# noconform / sysmem / gmem / etc.
-WRAPPER_BCN=0
-# 0 / 1 / 2
-WRAPPER_USE_BCN_CACHE=0
-# 0 / 1
-WRAPPER_SURFACE_FORMAT=bgra8
-# rgba8 / bgra8
-WRAPPER_DISABLE_PRESENT_WAIT=0
-# 0 / 1
-WRAPPER_VK_VERSION=1.4
-WRAPPER_EXTENSION_BLACKLIST=none
-WRAPPER_VMEM_MAX_SIZE=4096
-WRAPPER_RESOURCE_TYPE=auto
-MESA_NO_ERROR=1
-MESA_GL_VERSION_OVERRIDE=4.6
-MESA_GLES_VERSION_OVERRIDE=3.2
-MESA_VK_WSI_PRESENT_MODE=mailbox
-ZINK_DESCRIPTORS=lazy
-ZINK_DEBUG=compact
-GALLIUM_THREAD=1
-
-# HUD
-GALLIUM_HUD=simple,fps
-DXVK_HUD=fps
-INNER_EOF
-fi
-
-if [ ! -f "\${SHARED_DIR}/box64.txt" ]; then
-    cat > "\${SHARED_DIR}/box64.txt" << 'INNER_EOF'
-BOX64_DYNAREC=1
-BOX64_DYNAREC_SAFEFLAGS=1
-BOX64_DYNAREC_FASTNAN=1
-BOX64_DYNAREC_FASTROUND=1
-BOX64_DYNAREC_X87DOUBLE=0
-BOX64_DYNAREC_BIGBLOCK=3
-BOX64_DYNAREC_STRONGMEM=0
-BOX64_DYNAREC_FORWARD=512
-BOX64_DYNAREC_CALLRET=1
-BOX64_DYNAREC_WAIT=1
-BOX64_AVX=0
-BOX64_MAXCPU=0
-BOX64_UNITYPLAYER=0
-BOX64_DYNAREC_WEAKBARRIER=0
-BOX64_DYNAREC_ALIGNED_ATOMICS=0
-BOX64_DYNAREC_DF=1
-BOX64_DYNAREC_DIRTY=0
-BOX64_DYNAREC_NATIVEFLAGS=1
-BOX64_DYNAREC_PAUSE=0
-BOX64_MMAP32=1
-INNER_EOF
-fi
-
-if [ ! -f "\${SHARED_DIR}/fexcore.txt" ]; then
-    cat > "\${SHARED_DIR}/fexcore.txt" << 'INNER_EOF'
-FEX_TSOENABLED=0
-FEX_VECTORTSOENABLED=0
-FEX_HALFBARRIERTSOENABLED=0
-FEX_MEMCPYSETTSOENABLED=0
-FEX_X87REDUCEDPRECISION=1
-FEX_MULTIBLOCK=1
-FEX_MAXINST=5000
-FEX_HOSTFEATURES=off
-FEX_SMALLTSCSCALE=1
-FEX_SMCCHECKS=mtrack
-FEX_VOLATILEMETADATA=1
-FEX_MONOHACKS=1
-FEX_HIDEHYPERVISORBIT=0
-FEX_DISABLEL2CACHE=0
-FEX_DYNAMICL1CACHE=0
-INNER_EOF
-fi
-
-if [ ! -f "\${SHARED_DIR}/override_dll.txt" ]; then
-    cat > "\${SHARED_DIR}/override_dll.txt" << 'INNER_EOF'
-version=n,b
-nsisvclstyles=d
-INNER_EOF
-fi
+for cfg in desktop.txt box64.txt fexcore.txt override_dll.txt; do
+    [ -f "\${SHARED_DIR}/\${cfg}" ] || cp -f "\${TEMPLATE_DIR}/\${cfg}" "\${SHARED_DIR}/\${cfg}"
+done
 
 set -a
 source "\${SHARED_DIR}/desktop.txt"
@@ -235,6 +371,17 @@ set +a
 
 export XDG_DATA_DIRS="\${TERMUX_PREFIX}/share:\${XDG_DATA_DIRS:-}"
 export XDG_CONFIG_DIRS="\${TERMUX_PREFIX}/etc/xdg:\${XDG_CONFIG_DIRS:-}"
+
+# Several clients that read XDG_RUNTIME_DIR start up within moments of each
+# other below: Mesa (via xfce4-session/wine/the GPU wrapper, whose
+# get_or_create_user_temp_dir() does a bare mkdir() with no "already exists
+# and it's fine" handling — whichever process loses the race dies with
+# "mkdir ... failed: File exists"), plus pulseaudio's native socket/PID file
+# and dbus-launch's session bus socket. Setting XDG_RUNTIME_DIR ourselves
+# before anything starts means none of them ever hit that race.
+export XDG_RUNTIME_DIR="\${TERMUX_PREFIX}/tmp/xdg-runtime-\$(id -u)"
+mkdir -p "\${XDG_RUNTIME_DIR}"
+chmod 700 "\${XDG_RUNTIME_DIR}"
 
 case "\${OPENGL_DRIVER}" in
     zink)
@@ -320,6 +467,30 @@ pkill -9 xfce4-session > /dev/null 2>&1
 pkill -9 -f "dbus-daemon" > /dev/null 2>&1
 sleep 0.5
 
+if [ ! -d "\${WINEPREFIX}/drive_c/windows/system32" ]; then
+    echo "Preparing Wine prefix..."
+
+    unset PULSE_SERVER
+    pulseaudio --kill > /dev/null 2>&1
+    pulseaudio --start --exit-idle-time=-1 --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" > /dev/null 2>&1
+    sleep 1
+    export PULSE_SERVER=127.0.0.1
+
+    termux-x11 :0 -ac > /dev/null 2>&1 &
+    sleep 2
+    export DISPLAY=:0
+
+    export WINEDLLOVERRIDES="mscoree=d;mshtml=d"
+    wine wineboot -u
+    wineserver -w
+    unset WINEDLLOVERRIDES
+
+    pkill -9 -f "termux.x11" > /dev/null 2>&1
+    pulseaudio --kill > /dev/null 2>&1
+    unset PULSE_SERVER DISPLAY
+    sleep 0.5
+fi
+
 unset PULSE_SERVER
 pulseaudio --kill > /dev/null 2>&1
 pulseaudio --start --exit-idle-time=-1 --load="module-native-protocol-tcp auth-ip-acl=127.0.0.1 auth-anonymous=1" > /dev/null 2>&1
@@ -330,11 +501,6 @@ termux-x11 :0 -ac >> "\${DESKTOP_LOGFILE}" 2>&1 &
 am start --user 0 -n com.termux.x11/com.termux.x11.MainActivity
 sleep 2
 export DISPLAY=:0
-
-if [ ! -d "\${WINEPREFIX}/drive_c/windows/system32" ]; then
-    wine wineboot -u
-    wineserver -w
-fi
 
 wine reg add "HKCU\Software\Wine\Drivers" /v Audio /d "\${AUDIO_BACKEND}" /f > /dev/null 2>&1
 
@@ -419,7 +585,12 @@ wine start /Unix "$1"
 WEOF
 chmod +x "${TERMUX_PREFIX}/bin/winlaunch"
 
-mkdir -p ~/Desktop ~/.local/share/applications ~/.config
+mkdir -p ~/Desktop ~/.local/share/applications ~/.config ~/.config/gtk-3.0
+
+cat > ~/.config/gtk-3.0/bookmarks << EOF
+file://${HOME}/.wine/drive_c Windows
+file://${HOME}/storage/shared Android
+EOF
 
 cat > ~/.local/share/applications/wine.desktop << EOF
 [Desktop Entry]
