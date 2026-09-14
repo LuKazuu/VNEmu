@@ -1,7 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-#VNEmu
-#AerA
-#V6
+#VNEmuAerA
 set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
@@ -371,14 +369,6 @@ set +a
 
 export XDG_DATA_DIRS="\${TERMUX_PREFIX}/share:\${XDG_DATA_DIRS:-}"
 export XDG_CONFIG_DIRS="\${TERMUX_PREFIX}/etc/xdg:\${XDG_CONFIG_DIRS:-}"
-
-# Several clients that read XDG_RUNTIME_DIR start up within moments of each
-# other below: Mesa (via xfce4-session/wine/the GPU wrapper, whose
-# get_or_create_user_temp_dir() does a bare mkdir() with no "already exists
-# and it's fine" handling — whichever process loses the race dies with
-# "mkdir ... failed: File exists"), plus pulseaudio's native socket/PID file
-# and dbus-launch's session bus socket. Setting XDG_RUNTIME_DIR ourselves
-# before anything starts means none of them ever hit that race.
 export XDG_RUNTIME_DIR="\${TERMUX_PREFIX}/tmp/xdg-runtime-\$(id -u)"
 mkdir -p "\${XDG_RUNTIME_DIR}"
 chmod 700 "\${XDG_RUNTIME_DIR}"
