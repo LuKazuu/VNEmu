@@ -3,7 +3,7 @@ set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 VNEMU_RAW="https://raw.githubusercontent.com/LuKazuu/VNEmu/main"
-HANGOVER_TAG="hangover-wine-11.16-r31"
+HANGOVER_TAG="hangover-wine-11.18-r46"
 HANGOVER_BASE="https://github.com/LuKazuu/VNEmuWine/releases/download/${HANGOVER_TAG}"
 
 termux-setup-storage
@@ -59,10 +59,10 @@ cp -f "${EXTRA_LIBS_TMPDIR}/usr/share/vulkan/implicit_layer.d/libbcn_layer.json"
 ln -sfn "libandroid-shmem.so" "${TERMUX_PREFIX}/lib/libandroid-sysvshm.so"
 
 HANGOVER_DEBS=(
-    "hangover-wine_11.16_aarch64.deb"
-    "hangover-libarm64ecfex_11.16_aarch64.deb"
-    "hangover-wowbox64_11.16_aarch64.deb"
-    "hangover-libwow64fex_11.16_aarch64.deb"
+    "hangover-wine_11.18_aarch64.deb"
+    "hangover-libarm64ecfex_11.18_aarch64.deb"
+    "hangover-wowbox64_11.18_aarch64.deb"
+    "hangover-libwow64fex_11.18_aarch64.deb"
 )
 for deb in "${HANGOVER_DEBS[@]}"; do
     curl -fL --retry 3 --retry-all-errors -o "${WORKDIR}/${deb}" "${HANGOVER_BASE}/${deb}"
@@ -131,6 +131,7 @@ HODLL=libwow64fex.dll
 LC_ALL=en_US.UTF-8
 # en_US / ja_JP
 WINEESYNC=1
+WINE_FAST_YIELD=1
 WINE_DDRAW_GDI_FALLBACK=1
 WINE_DO_NOT_CREATE_DXGI_DEVICE_MANAGER=1
 WINEVMEMMAXSIZE=4096
@@ -168,7 +169,7 @@ WRAPPER_RESOURCE_TYPE=auto
 MESA_NO_ERROR=1
 MESA_GL_VERSION_OVERRIDE=4.6
 MESA_GLES_VERSION_OVERRIDE=3.2
-MESA_VK_WSI_PRESENT_MODE=mailbox
+MESA_VK_WSI_PRESENT_MODE=fifo
 GALLIUM_THREAD=1
 # 0 / 1
 ZINK_DESCRIPTORS=lazy
