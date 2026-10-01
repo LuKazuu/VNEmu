@@ -185,49 +185,74 @@ fi
 
 if [ ! -f "\${SHARED_DIR}/box64.txt" ]; then
     cat > "\${SHARED_DIR}/box64.txt" << 'INNER_EOF'
-BOX64_DYNAREC=1
-BOX64_DYNAREC_SAFEFLAGS=1
-BOX64_DYNAREC_FASTNAN=1
-BOX64_DYNAREC_FASTROUND=1
-BOX64_DYNAREC_X87DOUBLE=0
-BOX64_DYNAREC_BIGBLOCK=3
+WOWBOX_PRESET=extreme
+# extreme / performance / stable / compatible / custom
+# env below is ONLY applied when preset = custom (default values = extreme)
+BOX64_DYNAREC_SAFEFLAGS=0
+# 0 / 1 / 2
 BOX64_DYNAREC_STRONGMEM=0
-BOX64_DYNAREC_FORWARD=512
-BOX64_DYNAREC_CALLRET=1
+# 0 / 1 / 2 / 3 / 4
+BOX64_DYNAREC_FASTNAN=1
+# 0 / 1
+BOX64_DYNAREC_FASTROUND=1
+# 0 / 1 / 2
+BOX64_DYNAREC_X87DOUBLE=0
+# 0 / 1 / 2
+BOX64_DYNAREC=1
+# 0 / 1
 BOX64_DYNAREC_WAIT=1
-BOX64_AVX=0
-BOX64_MAXCPU=0
-BOX64_UNITYPLAYER=0
-BOX64_DYNAREC_WEAKBARRIER=0
+# 0 / 1
 BOX64_DYNAREC_ALIGNED_ATOMICS=0
-BOX64_DYNAREC_DF=1
-BOX64_DYNAREC_DIRTY=0
-BOX64_DYNAREC_NATIVEFLAGS=1
+# 0 / 1
+BOX64_DYNAREC_BIGBLOCK=2
+# 0 / 1 / 2 / 3
+BOX64_DYNAREC_CALLRET=1
+# 0 / 1
+BOX64_DYNAREC_WEAKBARRIER=0
+# 0 / 1 / 2
 BOX64_DYNAREC_PAUSE=0
-BOX64_MMAP32=1
+# 0 / 1 / 2 / 3
+BOX64_DYNAREC_DF=1
+# 0 / 1
+BOX64_DYNAREC_NATIVEFLAGS=1
+# 0 / 1
+BOX64_DYNAREC_DIV0=0
+# 0 / 1
+BOX64_CPUTYPE=0
+# 0 / 1
+BOX64_AVX=0
+# 0 / 1 / 2
 INNER_EOF
 fi
-
 if [ ! -f "\${SHARED_DIR}/fexcore.txt" ]; then
     cat > "\${SHARED_DIR}/fexcore.txt" << 'INNER_EOF'
+FEXCORE_PRESET=extreme
+# extreme / performance / stable / compatible / custom
+# env below is ONLY applied when preset = custom (default values = extreme)
 FEX_TSOENABLED=0
-FEX_VECTORTSOENABLED=0
-FEX_HALFBARRIERTSOENABLED=0
-FEX_MEMCPYSETTSOENABLED=0
+# 0 / 1
 FEX_X87REDUCEDPRECISION=1
+# 0 / 1
 FEX_MULTIBLOCK=1
+# 0 / 1
 FEX_MAXINST=5000
-FEX_HOSTFEATURES=off
+# number, 0 = unlimited
 FEX_SMALLTSCSCALE=1
-FEX_SMCCHECKS=mtrack
-FEX_VOLATILEMETADATA=1
-FEX_MONOHACKS=1
+# 0 / 1
+FEX_VECTORTSOENABLED=0
+# 0 / 1
+FEX_MEMCPYSETTSOENABLED=0
+# 0 / 1
+FEX_HALFBARRIERTSOENABLED=0
+# 0 / 1
 FEX_HIDEHYPERVISORBIT=0
-FEX_DISABLEL2CACHE=0
-FEX_DYNAMICL1CACHE=0
+# 0 / 1
+FEX_MONOHACKS=1
+# 0 / 1
+FEX_SMCCHECKS=mtrack
+# none / mtrack / full
 INNER_EOF
 fi
-
 if [ ! -f "\${SHARED_DIR}/override_dll.txt" ]; then
     cat > "\${SHARED_DIR}/override_dll.txt" << 'INNER_EOF'
 version=n,b
@@ -235,10 +260,171 @@ nsisvclstyles=d
 INNER_EOF
 fi
 
+apply_wowbox_preset() {
+    local preset="\${WOWBOX_PRESET:-extreme}"
+    preset="\${preset,,}"
+    case "\${preset}" in
+        extreme|performance|stable|compatible|custom) ;;
+        *)
+            echo "WOWBOX_PRESET=\${preset} is invalid, falling back to extreme" >&2
+            preset="extreme"
+            ;;
+    esac
+    case "\${preset}" in
+        custom)
+            ;;
+        extreme)
+            BOX64_DYNAREC_SAFEFLAGS=0
+            BOX64_DYNAREC_STRONGMEM=0
+            BOX64_DYNAREC_FASTNAN=1
+            BOX64_DYNAREC_FASTROUND=1
+            BOX64_DYNAREC_X87DOUBLE=0
+            BOX64_DYNAREC=1
+            BOX64_DYNAREC_WAIT=1
+            BOX64_DYNAREC_ALIGNED_ATOMICS=0
+            BOX64_DYNAREC_BIGBLOCK=2
+            BOX64_DYNAREC_CALLRET=1
+            BOX64_DYNAREC_WEAKBARRIER=0
+            BOX64_DYNAREC_PAUSE=0
+            BOX64_DYNAREC_DF=1
+            BOX64_DYNAREC_NATIVEFLAGS=1
+            BOX64_DYNAREC_DIV0=0
+            BOX64_CPUTYPE=0
+            BOX64_AVX=0
+            ;;
+        performance)
+            BOX64_DYNAREC_SAFEFLAGS=1
+            BOX64_DYNAREC_STRONGMEM=0
+            BOX64_DYNAREC_FASTNAN=1
+            BOX64_DYNAREC_FASTROUND=1
+            BOX64_DYNAREC_X87DOUBLE=0
+            BOX64_DYNAREC=1
+            BOX64_DYNAREC_WAIT=0
+            BOX64_DYNAREC_ALIGNED_ATOMICS=0
+            BOX64_DYNAREC_BIGBLOCK=2
+            BOX64_DYNAREC_CALLRET=1
+            BOX64_DYNAREC_WEAKBARRIER=0
+            BOX64_DYNAREC_PAUSE=0
+            BOX64_DYNAREC_DF=1
+            BOX64_DYNAREC_NATIVEFLAGS=1
+            BOX64_DYNAREC_DIV0=0
+            BOX64_CPUTYPE=0
+            BOX64_AVX=0
+            ;;
+        stable)
+            BOX64_DYNAREC_SAFEFLAGS=2
+            BOX64_DYNAREC_STRONGMEM=1
+            BOX64_DYNAREC_FASTNAN=1
+            BOX64_DYNAREC_FASTROUND=1
+            BOX64_DYNAREC_X87DOUBLE=0
+            BOX64_DYNAREC=1
+            BOX64_DYNAREC_WAIT=0
+            BOX64_DYNAREC_ALIGNED_ATOMICS=0
+            BOX64_DYNAREC_BIGBLOCK=2
+            BOX64_DYNAREC_CALLRET=0
+            BOX64_DYNAREC_WEAKBARRIER=1
+            BOX64_DYNAREC_PAUSE=0
+            BOX64_DYNAREC_DF=1
+            BOX64_DYNAREC_NATIVEFLAGS=1
+            BOX64_DYNAREC_DIV0=0
+            BOX64_CPUTYPE=0
+            BOX64_AVX=0
+            ;;
+        compatible)
+            BOX64_DYNAREC_SAFEFLAGS=2
+            BOX64_DYNAREC_STRONGMEM=1
+            BOX64_DYNAREC_FASTNAN=0
+            BOX64_DYNAREC_FASTROUND=1
+            BOX64_DYNAREC_X87DOUBLE=0
+            BOX64_DYNAREC=1
+            BOX64_DYNAREC_WAIT=0
+            BOX64_DYNAREC_ALIGNED_ATOMICS=0
+            BOX64_DYNAREC_BIGBLOCK=2
+            BOX64_DYNAREC_CALLRET=0
+            BOX64_DYNAREC_WEAKBARRIER=1
+            BOX64_DYNAREC_PAUSE=0
+            BOX64_DYNAREC_DF=1
+            BOX64_DYNAREC_NATIVEFLAGS=1
+            BOX64_DYNAREC_DIV0=0
+            BOX64_CPUTYPE=0
+            BOX64_AVX=0
+            ;;
+    esac
+}
+apply_fexcore_preset() {
+    local preset="\${FEXCORE_PRESET:-extreme}"
+    preset="\${preset,,}"
+    case "\${preset}" in
+        extreme|performance|stable|compatible|custom) ;;
+        *)
+            echo "FEXCORE_PRESET=\${preset} is invalid, falling back to extreme" >&2
+            preset="extreme"
+            ;;
+    esac
+    case "\${preset}" in
+        custom)
+            ;;
+        extreme)
+            FEX_TSOENABLED=0
+            FEX_X87REDUCEDPRECISION=1
+            FEX_MULTIBLOCK=1
+            FEX_MAXINST=5000
+            FEX_SMALLTSCSCALE=1
+            FEX_VECTORTSOENABLED=0
+            FEX_MEMCPYSETTSOENABLED=0
+            FEX_HALFBARRIERTSOENABLED=0
+            FEX_HIDEHYPERVISORBIT=0
+            FEX_MONOHACKS=1
+            FEX_SMCCHECKS=mtrack
+            ;;
+        performance)
+            FEX_TSOENABLED=1
+            FEX_X87REDUCEDPRECISION=1
+            FEX_MULTIBLOCK=0
+            FEX_MAXINST=5000
+            FEX_SMALLTSCSCALE=1
+            FEX_VECTORTSOENABLED=0
+            FEX_MEMCPYSETTSOENABLED=0
+            FEX_HALFBARRIERTSOENABLED=1
+            FEX_HIDEHYPERVISORBIT=0
+            FEX_MONOHACKS=1
+            FEX_SMCCHECKS=mtrack
+            ;;
+        stable)
+            FEX_TSOENABLED=1
+            FEX_X87REDUCEDPRECISION=0
+            FEX_MULTIBLOCK=0
+            FEX_MAXINST=5000
+            FEX_SMALLTSCSCALE=1
+            FEX_VECTORTSOENABLED=1
+            FEX_MEMCPYSETTSOENABLED=1
+            FEX_HALFBARRIERTSOENABLED=1
+            FEX_HIDEHYPERVISORBIT=0
+            FEX_MONOHACKS=1
+            FEX_SMCCHECKS=mtrack
+            ;;
+        compatible)
+            FEX_TSOENABLED=1
+            FEX_X87REDUCEDPRECISION=0
+            FEX_MULTIBLOCK=0
+            FEX_MAXINST=5000
+            FEX_SMALLTSCSCALE=1
+            FEX_VECTORTSOENABLED=0
+            FEX_MEMCPYSETTSOENABLED=0
+            FEX_HALFBARRIERTSOENABLED=1
+            FEX_HIDEHYPERVISORBIT=0
+            FEX_MONOHACKS=1
+            FEX_SMCCHECKS=mtrack
+            ;;
+    esac
+}
+
 set -a
 source "\${SHARED_DIR}/desktop.txt"
 source "\${SHARED_DIR}/box64.txt"
 source "\${SHARED_DIR}/fexcore.txt"
+apply_wowbox_preset
+apply_fexcore_preset
 set +a
 
 export XDG_DATA_DIRS="\${TERMUX_PREFIX}/share:\${XDG_DATA_DIRS:-}"
