@@ -3,7 +3,7 @@ set -euo pipefail
 TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 
 VNEMU_RAW="https://raw.githubusercontent.com/LuKazuu/VNEmu/main"
-HANGOVER_TAG="hangover-wine-11.18-r46"
+HANGOVER_TAG="hangover-wine-11.18-r48"
 HANGOVER_BASE="https://github.com/LuKazuu/VNEmuWine/releases/download/${HANGOVER_TAG}"
 
 termux-setup-storage
