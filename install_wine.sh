@@ -6,9 +6,9 @@ TERMUX_PREFIX="${PREFIX:-/data/data/com.termux/files/usr}"
 VNEMU_RAW="https://raw.githubusercontent.com/LuKazuu/VNEmu/main"
 # --- package config (wine) ---
 PKG_NAME="wine-termux"
-PKG_VERSION="11.18"
+PKG_VERSION="11.20"
 PKG_REPO="LuKazuu/VNEmuWine"
-PKG_TAG="vnemuwine-11.18-r54"
+PKG_TAG="vnemuwine-11.20-r58"
 PKG_PREFIX_DIR=".wine"
 # -----------------------------------------------------------------------
 PKG_BASE="https://github.com/${PKG_REPO}/releases/download/${PKG_TAG}"

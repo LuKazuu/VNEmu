@@ -9,7 +9,7 @@ VNEMU_RAW="https://raw.githubusercontent.com/LuKazuu/VNEmu/main"
 PROTON_PKG_NAME="proton-termux"
 PROTON_PKG_VERSION="11-1"
 PROTON_PKG_REPO="LuKazuu/VNEmuProton"
-PROTON_PKG_TAG="vnemuproton-bleeding-edge-r26"
+PROTON_PKG_TAG="vnemuproton-bleeding-edge-r30"
 PROTON_PREFIX_DIR=".proton"
 PROTON_BASE="https://github.com/${PROTON_PKG_REPO}/releases/download/${PROTON_PKG_TAG}"
 PROTON_DEBS=(
@@ -22,9 +22,9 @@ PROTON_INSTALL_DIR="${TERMUX_PREFIX}/opt/${PROTON_PKG_NAME}"
 
 # --- package config (wine) ---
 WINE_PKG_NAME="wine-termux"
-WINE_PKG_VERSION="11.18"
+WINE_PKG_VERSION="11.20"
 WINE_PKG_REPO="LuKazuu/VNEmuWine"
-WINE_PKG_TAG="vnemuwine-11.18-r54"
+WINE_PKG_TAG="vnemuwine-11.20-r58"
 WINE_PREFIX_DIR=".wine"
 WINE_BASE="https://github.com/${WINE_PKG_REPO}/releases/download/${WINE_PKG_TAG}"
 WINE_DEBS=(

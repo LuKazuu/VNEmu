@@ -8,7 +8,7 @@ VNEMU_RAW="https://raw.githubusercontent.com/LuKazuu/VNEmu/main"
 PKG_NAME="proton-termux"
 PKG_VERSION="11-1"
 PKG_REPO="LuKazuu/VNEmuProton"
-PKG_TAG="vnemuproton-bleeding-edge-r26"
+PKG_TAG="vnemuproton-bleeding-edge-r30"
 PKG_PREFIX_DIR=".proton"
 # -----------------------------------------------------------------------
 PKG_BASE="https://github.com/${PKG_REPO}/releases/download/${PKG_TAG}"
